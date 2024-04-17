@@ -1,0 +1,115 @@
+[gd_scene load_steps=10 format=3 uid="uid://dynv7y3by6dvx"]
+
+[ext_resource type="Script" path="res://scripts/Gameplay/main_game.gd" id="1_2gask"]
+[ext_resource type="FontFile" uid="uid://d3u5428h3aenu" path="res://assets/fonts/Kaph-Regular.ttf" id="1_pyx26"]
+[ext_resource type="Texture2D" uid="uid://cu8a0x6e6p8pb" path="res://assets/UI/background.png" id="2_w08m4"]
+[ext_resource type="Script" path="res://scripts/UI/MainUI.gd" id="3_gqje3"]
+[ext_resource type="AudioStream" uid="uid://bgwa7ulxvccos" path="res://assets/bgm/gamemain.mp3" id="5_iytmj"]
+[ext_resource type="Theme" uid="uid://vb12ay5d7wb4" path="res://assets/theme/start_ui.tres" id="6_n8nu8"]
+[ext_resource type="Texture2D" uid="uid://bg0blp537b6sj" path="res://assets/UI/back.png" id="6_quckl"]
+[ext_resource type="Texture2D" uid="uid://cgx3nqcticwhx" path="res://assets/UI/restart.png" id="7_5n6qk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xdch4"]
+size = Vector2(1020, 640)
+
+[node name="MainGame" type="Node2D"]
+script = ExtResource("1_2gask")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_iytmj")
+
+[node name="UI" type="Node2D" parent="."]
+script = ExtResource("3_gqje3")
+
+[node name="background" type="TextureRect" parent="UI"]
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("2_w08m4")
+expand_mode = 1
+
+[node name="remainCount" type="Label" parent="UI"]
+offset_left = 1712.0
+offset_top = 143.0
+offset_right = 1768.0
+offset_bottom = 171.0
+theme_override_colors/font_shadow_color = Color(0.454902, 0, 0.188235, 1)
+theme_override_constants/outline_size = 2
+theme_override_constants/shadow_outline_size = 3
+theme_override_fonts/font = ExtResource("1_pyx26")
+theme_override_font_sizes/font_size = 24
+text = "136"
+
+[node name="remainCountTitle" type="Label" parent="UI"]
+offset_left = 1453.0
+offset_top = 143.0
+offset_right = 1693.0
+offset_bottom = 171.0
+theme_override_colors/font_shadow_color = Color(0.454902, 0, 0.188235, 1)
+theme_override_constants/outline_size = 2
+theme_override_constants/shadow_outline_size = 3
+theme_override_fonts/font = ExtResource("1_pyx26")
+theme_override_font_sizes/font_size = 24
+text = "Remain Count:"
+
+[node name="achieveBoxContainer" type="BoxContainer" parent="UI"]
+offset_left = 1320.0
+offset_top = 280.0
+offset_right = 1602.0
+offset_bottom = 596.0
+
+[node name="achieveCount" type="Label" parent="UI"]
+offset_left = 1712.0
+offset_top = 104.0
+offset_right = 1768.0
+offset_bottom = 132.0
+theme_override_colors/font_shadow_color = Color(0.454902, 0, 0.188235, 1)
+theme_override_constants/outline_size = 2
+theme_override_constants/shadow_outline_size = 3
+theme_override_fonts/font = ExtResource("1_pyx26")
+theme_override_font_sizes/font_size = 24
+text = "0
+"
+
+[node name="achieveCountTitle" type="Label" parent="UI"]
+offset_left = 1440.0
+offset_top = 104.0
+offset_right = 1692.0
+offset_bottom = 132.0
+theme_override_colors/font_shadow_color = Color(0.454902, 0, 0.188235, 1)
+theme_override_constants/outline_size = 2
+theme_override_constants/shadow_outline_size = 3
+theme_override_fonts/font = ExtResource("1_pyx26")
+theme_override_font_sizes/font_size = 24
+text = "Achieve Count:"
+
+[node name="backButton" type="TextureButton" parent="UI"]
+offset_left = 128.0
+offset_top = 104.0
+offset_right = 195.0
+offset_bottom = 171.0
+theme = ExtResource("6_n8nu8")
+texture_normal = ExtResource("6_quckl")
+texture_pressed = ExtResource("6_quckl")
+texture_hover = ExtResource("6_quckl")
+texture_disabled = ExtResource("6_quckl")
+texture_focused = ExtResource("6_quckl")
+
+[node name="restartButton" type="TextureButton" parent="UI"]
+offset_left = 256.0
+offset_top = 104.0
+offset_right = 323.0
+offset_bottom = 171.0
+texture_normal = ExtResource("7_5n6qk")
+
+[node name="Board" type="StaticBody2D" parent="."]
+position = Vector2(320, -24)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Board"]
+position = Vector2(656, 624)
+shape = SubResource("RectangleShape2D_xdch4")
+
+[node name="Board" type="Node2D" parent="Board"]
+position = Vector2(144, 304)
+
+[connection signal="pressed" from="UI/backButton" to="UI" method="_on_back_button_pressed"]
+[connection signal="pressed" from="UI/restartButton" to="UI" method="_on_restart_button_pressed"]
