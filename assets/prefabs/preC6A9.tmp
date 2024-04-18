@@ -16,10 +16,10 @@ size = Vector2(10, 124)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6lf88"]
 size = Vector2(114, 10)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_dwuh0"]
-size = Vector2(49, 64.5)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_uaow7"]
+size = Vector2(49, 65)
 
-[node name="Prefab-mahjong" type="CharacterBody2D"]
+[node name="Prefab-mahjong" type="RigidBody2D"]
 position = Vector2(30, 40)
 script = ExtResource("1_bv2jq")
 metadata/piece = 0
@@ -55,8 +55,8 @@ position = Vector2(-6, 8)
 shape = SubResource("RectangleShape2D_6lf88")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-6.5, 7.75)
-shape = SubResource("RectangleShape2D_dwuh0")
+position = Vector2(-6.5, 7.5)
+shape = SubResource("RectangleShape2D_uaow7")
 
 [connection signal="mouse_entered" from="ClickArea" to="." method="_on_area_2d_mouse_entered"]
 [connection signal="mouse_exited" from="ClickArea" to="." method="_on_area_2d_mouse_exited"]

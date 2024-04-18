@@ -1,5 +1,6 @@
 extends Node2D
 
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
@@ -9,12 +10,9 @@ func _ready():
 func _process(delta):
 	pass
 
-func _on_back_button_pressed():
-	$ClickButtonPlayer.play()
-	get_tree().change_scene_to_file("res://assets/level/start_ui.tscn")
-	pass
+func _on_quit_button_pressed():
+	get_tree().quit()
 
-func _on_restart_button_pressed():
-	$ClickButtonPlayer.play()
-	get_parent().start_new_game()
-	pass
+func _on_again_button_pressed():
+	self.visible = false
+	get_tree().reload_current_scene()

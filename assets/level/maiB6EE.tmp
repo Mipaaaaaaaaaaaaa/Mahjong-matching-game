@@ -146,7 +146,7 @@ shape = SubResource("WorldBoundaryShape2D_iv14f")
 one_way_collision = true
 
 [node name="Board" type="Node2D" parent="."]
-position = Vector2(160, 240)
+position = Vector2(160, 272)
 scale = Vector2(1.44, 1.44)
 
 [node name="SE" type="Node2D" parent="."]

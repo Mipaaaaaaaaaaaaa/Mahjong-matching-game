@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://dafrom8owxnks"]
+[gd_scene load_steps=7 format=3 uid="uid://dafrom8owxnks"]
 
 [ext_resource type="Script" path="res://scripts/UI/StartUI.gd" id="1_1udpj"]
 [ext_resource type="FontFile" uid="uid://d3u5428h3aenu" path="res://assets/fonts/Kaph-Regular.ttf" id="2_dwjbf"]
 [ext_resource type="Texture2D" uid="uid://cu8a0x6e6p8pb" path="res://assets/UI/background.png" id="2_hpc5x"]
 [ext_resource type="Theme" uid="uid://vb12ay5d7wb4" path="res://assets/theme/start_ui.tres" id="3_vi5yq"]
+[ext_resource type="Theme" uid="uid://cyhtfq7v4nxvx" path="res://assets/theme/button_pink.tres" id="3_xw0hr"]
 [ext_resource type="AudioStream" uid="uid://bs84msqexyagr" path="res://assets/bgm/start.mp3" id="4_8bhoj"]
 
 [node name="StartUI" type="Node2D"]
@@ -17,19 +18,19 @@ expand_mode = 1
 
 [node name="startButton" type="Button" parent="."]
 offset_left = 784.0
-offset_top = 616.0
-offset_right = 1180.0
-offset_bottom = 697.0
-theme = ExtResource("3_vi5yq")
+offset_top = 760.0
+offset_right = 1134.0
+offset_bottom = 880.0
+theme = ExtResource("3_xw0hr")
 theme_override_fonts/font = ExtResource("2_dwjbf")
 theme_override_font_sizes/font_size = 48
 text = "Start"
 
 [node name="titleLabel" type="Label" parent="."]
-offset_left = 592.0
-offset_top = 224.0
-offset_right = 2307.0
-offset_bottom = 521.0
+offset_left = 552.0
+offset_top = 352.0
+offset_right = 2267.0
+offset_bottom = 649.0
 theme_override_colors/font_color = Color(1, 0.509804, 0.627451, 1)
 theme_override_colors/font_outline_color = Color(1, 1, 1, 1)
 theme_override_constants/outline_size = 30
@@ -38,19 +39,16 @@ theme_override_font_sizes/font_size = 128
 text = "Mahjong
 Matching!"
 
-[node name="quitButton" type="Button" parent="."]
-offset_left = 784.0
-offset_top = 744.0
-offset_right = 1180.0
-offset_bottom = 825.0
-theme = ExtResource("3_vi5yq")
-theme_override_fonts/font = ExtResource("2_dwjbf")
-theme_override_font_sizes/font_size = 48
-text = "Quit
-"
-
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("4_8bhoj")
 
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+offset_left = 776.0
+offset_top = 1008.0
+offset_right = 1640.0
+offset_bottom = 1056.0
+theme = ExtResource("3_vi5yq")
+theme_override_font_sizes/normal_font_size = 24
+text = "@Author:Magicmipamipa"
+
 [connection signal="pressed" from="startButton" to="." method="_on_start_button_pressed"]
-[connection signal="pressed" from="quitButton" to="." method="_on_quit_button_pressed"]
