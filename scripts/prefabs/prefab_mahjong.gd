@@ -9,6 +9,9 @@ var drag_start_position = Vector2()
 var dragMinDistance = 30
 var moving = false
 
+var xIndex = 0
+var yIndex = 0
+
 enum Direction{
 	UP = 0,
 	DOWN = 1,
@@ -25,18 +28,13 @@ func _ready():
 func _process(delta):
 	if self.dragging:
 		# 先确定是横向移动还是纵向移动
-		var drag_distance = drag_start_position - get_viewport().get_mouse_position()
-		if drag_distance.length() > dragMinDistance:
-			if abs(drag_distance.x) > abs(drag_distance.y):
-				if drag_distance.x > 0:
-					move_object(Direction.LEFT)
-				else:
-					move_object(Direction.RIGHT)
+		var drag_distance = get_viewport().get_mouse_position() - drag_start_position
+		var main_game = _get_main_game()
+		if main_game:
+			if drag_distance.length() > dragMinDistance:
+				main_game.update_move_pos(xIndex, yIndex, drag_distance)
 			else:
-				if drag_distance.y > 0:
-					move_object(Direction.UP)
-				else:
-					move_object(Direction.DOWN)
+				main_game.reset_all_moving()
 
 func move_object(direction):
 	# 找到所有与它接壤的格子
@@ -75,8 +73,22 @@ func set_piece(piece):
 	$Sprite.texture = piece_texture
 	self.piece = piece
 
+func set_cur_pos(x, y):
+	xIndex = x
+	yIndex = y
+
+func set_offset(pieceSize, offset):
+	position = Vector2(pieceSize.x * xIndex + offset.x, pieceSize.y * yIndex + offset.y)
+
+func reset_moving(pieceSize):
+	moving = false
+	position = Vector2(pieceSize.x * xIndex, pieceSize.y * yIndex)
+
 func _input(event):
 	if event is InputEventMouseButton and not event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT:
+		if dragging:
+			var game_main = _get_main_game()
+			game_main.set_afterdrag_pos()
 		dragging = false
 		if bMouseOver:
 			piece_clicked.emit(self)
@@ -98,3 +110,9 @@ func set_selected(bSelected):
 		$board.visible = true
 	else:
 		$board.visible = false
+
+func _get_main_game():
+	var parent = self.get_parent()
+	if not parent:
+		return null
+	return parent.get_parent()
