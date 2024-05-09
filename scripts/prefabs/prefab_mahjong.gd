@@ -1,4 +1,4 @@
-extends CharacterBody2D
+extends Node2D
 
 signal piece_clicked
 
@@ -32,36 +32,10 @@ func _process(delta):
 		var main_game = _get_main_game()
 		if main_game:
 			if drag_distance.length() > dragMinDistance:
-				main_game.update_move_pos(xIndex, yIndex, drag_distance)
+				var realDistance = Vector2(drag_distance.x / get_parent().scale.x, drag_distance.y / get_parent().scale.y)
+				main_game.update_move_pos(xIndex, yIndex, realDistance)
 			else:
 				main_game.reset_all_moving()
-
-func move_object(direction):
-	# 找到所有与它接壤的格子
-	moving = true
-	var objects = []
-	var node_name = ""
-	if direction == Direction.UP or direction == Direction.DOWN:
-		node_name = "colArea"
-	elif direction == Direction.LEFT or direction == Direction.RIGHT:
-		node_name = "rowArea"
-	# 让他们也移动
-	objects = get_node(node_name).get_overlapping_areas()
-
-	for object in objects:
-		if object.name == node_name:
-			if not object.get_parent().moving:
-				object.get_parent().move_object(direction)
-
-	# 移动自己
-	if direction == Direction.UP:
-		move_and_collide(Vector2(0, -64))
-	elif direction == Direction.DOWN:
-		move_and_collide(Vector2(0, 64))
-	elif direction == Direction.LEFT:
-		move_and_collide(Vector2(-64, 0))
-	elif direction == Direction.RIGHT:
-		move_and_collide(Vector2(64, 0))
 
 func set_piece(piece):
 	#先把数字补到两位的字符
@@ -83,6 +57,14 @@ func set_offset(pieceSize, offset):
 func reset_moving(pieceSize):
 	moving = false
 	position = Vector2(pieceSize.x * xIndex, pieceSize.y * yIndex)
+
+func set_cur_z_index(pieceSize, boardSize, bHorizonMove):
+	var curX = 1+floor(position.x/pieceSize.x)
+	var curY = 1+floor(position.y/pieceSize.y)
+	if bHorizonMove:
+		z_index = curX + (boardSize.y - curY) * boardSize.x
+	else:
+		z_index = curX * boardSize.y + (boardSize.y - curY)
 
 func _input(event):
 	if event is InputEventMouseButton and not event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT:

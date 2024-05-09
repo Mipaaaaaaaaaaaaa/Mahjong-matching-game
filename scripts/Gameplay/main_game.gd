@@ -21,6 +21,10 @@ var last_clicked_piece = null
 var board = []
 var boardNodes = []
 
+# match一次之后才能继续平移
+var hasMatched = true
+var lastMoveDir
+
 # Called when the node enters the scene tree for 	the first time.
 func _ready():
 	$BgmPlayer.play()
@@ -41,6 +45,7 @@ func start_new_game():
 		child.queue_free()
 	initialize_board()
 	refresh_achieve_info()
+	hasMatched = true #默认状态可以移动
 
 func refresh_achieve_info():
 	$UI.get_node("achieveCount").text = str(achieve_count)
@@ -88,29 +93,24 @@ func initialize_board():
 	# 打印棋盘，用于调试
 	print_board()
 	# 更新棋盘
-	for i in range(board_size.x):
-		var xIndex = i
-		for j in range(board_size.y,0,-1):
-			var yIndex = j - 1
-			
+	for xIndex in range(board_size.x):
+		var colNodes = []
+		for yIndex in range(0, board_size.y):
 			var piece = board[xIndex][yIndex]
-			var piece_node = $Board.get_node(str(xIndex) + "_" + str(yIndex))
-			if piece_node != null:
-				piece_node.queue_free()
-			piece_node = prefab_mahjong.instantiate()
-			piece_node.name = str(xIndex) + "_" + str(yIndex)
+			var piece_node = prefab_mahjong.instantiate()
+			var strName = str(xIndex) + "_" + str(yIndex)
+			piece_node.name = strName
 			#放到最下面，不然会被覆盖
 			$Board.add_child(piece_node)
 			piece_node.set_piece(piece)
 			piece_node.set_cur_pos(xIndex, yIndex)
 			piece_node.reset_moving(pieceSize)
 			piece_node.piece_clicked.connect(_on_piece_click)
-	
-	for i in range(board_size.x):
-		var colNodes = []
-		for j in range(board_size.y):
-			colNodes.append($Board.get_node(str(i) + "_" + str(j)))
+			
+			colNodes.append(piece_node)
 		boardNodes.append(colNodes)
+	
+	reset_all_z_index()
 	pass
 
 func print_board():
@@ -145,6 +145,8 @@ func _on_piece_click(piece):
 			piece.queue_free()
 			refresh_achieve_info()
 			$SE.get_node("MergePlayer").play()
+			
+			hasMatched = true
 	if last_clicked_piece != null:
 		last_clicked_piece.set_selected(false)
 	piece.set_selected(true)
@@ -153,21 +155,41 @@ func _on_piece_click(piece):
 	$SE.get_node("ClickPlayer1").play()
 
 func are_adjacent(piece1, piece2):
-	# 检查两个Piece是否接壤（我真是天才啊）
-	var overlapping_areas = piece1.get_node("Area2D").get_overlapping_areas()
-	for i in range(overlapping_areas.size()):
-		var area = overlapping_areas[i]
-		if area.get_parent() == piece2:
-			return true
-	return false
+	if piece1.xIndex != piece2.xIndex and piece1.yIndex != piece2.yIndex:
+		return false
+	
+	var count = 0
+	#实际上只有一个循环有效
+	for xInd in range(min(piece1.xIndex, piece2.xIndex), max(piece1.xIndex, piece2.xIndex)+1):
+		for yInd in range(min(piece1.yIndex, piece2.yIndex), max(piece1.yIndex, piece2.yIndex)+1):
+			if boardNodes[xInd][yInd] != null:
+				count += 1
+	
+	return count <= 2
 
 func reset_all_moving():
 	for child in $Board.get_children():
-		child.reset_moving(pieceSize)
+		if child.moving:
+			child.reset_moving(pieceSize)
+
+func reset_all_z_index(bHorizon = true):
+	for child in $Board.get_children():
+		child.set_cur_z_index(pieceSize, board_size, bHorizon)
 
 func get_move_list(xIndex, yIndex, direction):
-	var ret = [boardNodes[xIndex][yIndex]]
-	for i in range(1, max(board_size.x, board_size.y)):
+	var ret = []
+	for i in range(1, max(board_size.x, board_size.y)+1):
+		var tmpX = xIndex - direction.x * i
+		var tmpY = yIndex - direction.y * i
+		if tmpX < 0 or tmpX >= board_size.x or tmpY < 0 or tmpY >= board_size.y:
+			break
+		
+		if boardNodes[tmpX][tmpY] != null:
+			ret.append(boardNodes[tmpX][tmpY])
+		else:
+			break
+	ret.append(boardNodes[xIndex][yIndex])
+	for i in range(1, max(board_size.x, board_size.y)+1):
 		var tmpX = xIndex + direction.x * i
 		var tmpY = yIndex + direction.y * i
 		if tmpX < 0 or tmpX >= board_size.x or tmpY < 0 or tmpY >= board_size.y:
@@ -185,7 +207,7 @@ func get_move_range(piece, direction):
 	var xIndex = piece.xIndex
 	var yIndex = piece.yIndex
 	
-	for i in range(1, max(board_size.x, board_size.y)):
+	for i in range(1, max(board_size.x, board_size.y)+1):
 		var tmpX = xIndex + direction.x * i
 		var tmpY = yIndex + direction.y * i
 		
@@ -194,12 +216,15 @@ func get_move_range(piece, direction):
 			return [min(0, offset), max(0, offset)]
 
 func check_moveable(xIndex, yIndex, direction):
-	xIndex = xIndex - direction.x
-	yIndex = yIndex - direction.y
-	
-	if xIndex < 0 or xIndex >= board_size.x or yIndex < 0 or yIndex >= board_size.y or boardNodes[xIndex][yIndex] == null:
-		return true
-	return false
+	if not hasMatched:
+		return false
+	return true	
+#	xIndex = xIndex - direction.x
+#	yIndex = yIndex - direction.y
+#
+#	if xIndex < 0 or xIndex >= board_size.x or yIndex < 0 or yIndex >= board_size.y or boardNodes[xIndex][yIndex] == null:
+#		return true
+#	return false
 
 func update_move_pos(xIndex, yIndex, drag_distance):
 	var normal_distance
@@ -211,7 +236,12 @@ func update_move_pos(xIndex, yIndex, drag_distance):
 		normal_distance = Vector2(0, drag_distance.y)
 		direction = Vector2(0, 1 if drag_distance.y > 0 else -1)
 	
-	reset_all_moving()
+	if direction != lastMoveDir:
+		reset_all_moving()
+	if !lastMoveDir or lastMoveDir.x * direction.x == 0:
+		reset_all_z_index(direction.x != 0)
+	lastMoveDir = direction
+	
 	if not check_moveable(xIndex, yIndex, direction):
 		return
 	
@@ -226,6 +256,7 @@ func update_move_pos(xIndex, yIndex, drag_distance):
 	
 	for piece in move_list:
 		piece.set_offset(pieceSize, clamp_offset)
+		piece.set_cur_z_index(pieceSize, board_size, direction.x != 0)
 
 func set_afterdrag_pos():
 	var move_list = []
@@ -236,7 +267,14 @@ func set_afterdrag_pos():
 	for piece in move_list:
 		var newXIndex = floor((piece.position.x + pieceSize.x/2)/pieceSize.x)
 		var newYIndex = floor((piece.position.y + pieceSize.y/2)/pieceSize.y)
+		
+		if newXIndex!=piece.xIndex or newYIndex!=piece.yIndex:
+			hasMatched = false
+		
 		piece.set_cur_pos(newXIndex, newYIndex)
 		piece.reset_moving(pieceSize)
 		boardNodes[piece.xIndex][piece.yIndex] = piece
+	
+	reset_all_z_index()
+	lastMoveDir = null
 
