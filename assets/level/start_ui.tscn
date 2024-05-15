@@ -46,9 +46,10 @@ stream = ExtResource("4_8bhoj")
 offset_left = 776.0
 offset_top = 1008.0
 offset_right = 1640.0
-offset_bottom = 1056.0
+offset_bottom = 1069.0
 theme = ExtResource("3_vi5yq")
 theme_override_font_sizes/normal_font_size = 24
-text = "@Author:Magicmipamipa"
+text = "@Author:Magicmipamipa
+			RunaYuurei"
 
 [connection signal="pressed" from="startButton" to="." method="_on_start_button_pressed"]

@@ -269,7 +269,8 @@ func set_afterdrag_pos():
 		var newYIndex = floor((piece.position.y + pieceSize.y/2)/pieceSize.y)
 		
 		if newXIndex!=piece.xIndex or newYIndex!=piece.yIndex:
-			hasMatched = false
+			#hasMatched = false
+			pass
 		
 		piece.set_cur_pos(newXIndex, newYIndex)
 		piece.reset_moving(pieceSize)
